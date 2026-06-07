@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Analysis | Cyber Fraud Intelligence</title>
+    <!-- Professional Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- vis.js for Network Graph -->
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <script>
+        // Dashboard Access Control
+        if (!localStorage.getItem('policeUser')) {
+            window.location.href = 'login.html';
+        }
+        function logout() {
+            localStorage.removeItem('policeUser');
+            window.location.href = 'login.html';
+        }
+    </script>
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <i class="fa-solid fa-building-shield"></i>
+                <span>Cyber Intel Command</span>
+            </div>
+            
+            <nav class="nav-menu" style="margin-top: 2rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                <a href="index.html" class="nav-link">
+                    <i class="fa-solid fa-gauge-high"></i>
+                    <span>Intelligence Overview</span>
+                </a>
+                <a href="graph.html" class="nav-link active">
+                    <i class="fa-solid fa-network-wired"></i>
+                    <span>Forensic Topology</span>
+                </a>
+                <a href="index.html#threats-table" class="nav-link">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span>Active Threat Logs</span>
+                </a>
+                <a href="index.html#awareness-generator" class="nav-link">
+                    <i class="fa-solid fa-bullhorn"></i>
+                    <span>Awareness Portal</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer" style="margin-top: auto; padding: 1rem 0;">
+                <button class="btn-logout" onclick="logout()" style="width: 100%; justify-content: center; border-radius: 8px;">
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content" style="flex: 1; height: 100vh; display: flex; flex-direction: column; overflow: hidden;">
+            <header class="dashboard-header">
+                <div class="header-content">
+                    <div class="header-title-area">
+                        <h1>Network Analysis Center</h1>
+                        <p>Advanced Forensic Mapping of Cyber Threat Infrastructure</p>
+                    </div>
+                    <div class="header-actions">
+                        <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Theme">
+                            <i class="fa-solid fa-moon"></i>
+                            <i class="fa-solid fa-sun"></i>
+                        </button>
+                        <div class="status-indicator">
+                            <span class="pulse"></span>
+                            <span id="last-updated">Live Monitoring Active</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="dashboard-container" style="flex: 1; padding: 1.5rem; display: flex; flex-direction: column; overflow: hidden; max-width: none;">
+                <!-- Forensic Graph Container -->
+                <section class="graph-section" style="flex: 1; display: flex; flex-direction: column; border: 1px solid var(--border-color); background: var(--bg-card); border-radius: var(--radius-lg); overflow: hidden;">
+                    <div class="section-header" style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h2 style="font-size: 1rem;"><i class="fa-solid fa-network-wired"></i> Forensic Network Projection</h2>
+                        </div>
+                        <div class="graph-controls">
+                            <select id="graph-focus-select" class="form-control" style="min-width: 300px; padding: 0.5rem 1rem;">
+                                <option value="all">Global Intelligence Overview</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="graph-layout" style="flex: 1; display: grid; grid-template-columns: 1fr 400px; height: auto;">
+                        <!-- Main Graph Area -->
+                        <div class="graph-main" style="position: relative; flex: 1;">
+                            <!-- Floating Legend -->
+                            <div class="graph-legend" style="position: absolute; top: 1rem; left: 1rem; z-index: 10; background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(10px); padding: 1.25rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); flex-direction: column; gap: 0.75rem; box-shadow: var(--shadow-lg);">
+                                <div class="legend-item"><span class="legend-color" style="background: var(--accent-blue);"></span> APK Source</div>
+                                <div class="legend-item"><span class="legend-color" style="background: var(--accent-purple);"></span> Clustered Behavior</div>
+                                <div class="legend-item"><span class="legend-color" style="background: var(--color-danger); box-shadow: 0 0 10px var(--color-danger);"></span> Root Malware Hash</div>
+                                <div class="legend-item"><span class="legend-color" style="background: #a855f7;"></span> Malicious URL</div>
+                                <div class="legend-item"><span class="legend-color" style="background: var(--color-success);"></span> Command Domain</div>
+                                <div class="legend-item"><span class="legend-color" style="background: var(--color-warning);"></span> Resolved IP</div>
+                                <div class="legend-item"><span class="legend-color" style="background: #ec4899;"></span> Digital Certificate</div>
+                            </div>
+                            
+                            <!-- The actual Vis.js container -->
+                            <div id="network-graph-container" class="network-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></div>
+                        </div>
+                        
+                        <!-- Sidebar Details -->
+                        <div class="graph-sidebar" style="background: var(--bg-slate); border-left: 1px solid var(--border-color); overflow-y: auto; padding: 0;">
+                            <div id="node-details" class="details-panel">
+                                <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.1);">
+                                    <h3 style="margin: 0; font-size: 0.9rem; letter-spacing: 0.05em; text-transform: uppercase;"><i class="fa-solid fa-fingerprint"></i> Intelligence Inspector</h3>
+                                </div>
+                                <div id="panel-content" class="panel-content" style="padding: 1.5rem;">
+                                    <div class="empty-state" style="text-align: center; padding: 4rem 1rem; opacity: 0.5;">
+                                        <i class="fa-solid fa-microscope fa-3x" style="margin-bottom: 1.5rem;"></i>
+                                        <p style="font-size: 0.85rem;">Select a node in the network to inspect its forensic fingerprint.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

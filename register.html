@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Officer Registration | Police Intelligence Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-body">
+    <div class="auth-card">
+        <div class="auth-header">
+            <i class="fa-solid fa-user-shield"></i>
+            <h2>Officer Registration</h2>
+            <p>Onboard to Intelligence Network</p>
+        </div>
+
+        <div id="alert-box" class="alert" style="margin-bottom: 1.5rem; padding: 0.75rem; border-radius: 8px; font-size: 0.85rem; display: none; text-align: center;"></div>
+
+        <form id="register-form">
+            <div class="form-group" style="margin-bottom: 1.25rem;">
+                <label for="reg-name" style="display: block; margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">Full Name</label>
+                <input type="text" id="reg-name" class="form-control" placeholder="Officer John Doe" required style="background: var(--bg-obsidian); border: 1px solid var(--border-color); color: white; width: 100%; padding: 0.75rem; border-radius: 8px;">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 1.25rem;">
+                <label for="reg-badge" style="display: block; margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">Badge Number</label>
+                <input type="text" id="reg-badge" class="form-control" placeholder="POL-7782" required style="background: var(--bg-obsidian); border: 1px solid var(--border-color); color: white; width: 100%; padding: 0.75rem; border-radius: 8px;">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 1.25rem;">
+                <label for="reg-email" style="display: block; margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">Police Email</label>
+                <input type="email" id="reg-email" class="form-control" placeholder="officer@dept.gov" required style="background: var(--bg-obsidian); border: 1px solid var(--border-color); color: white; width: 100%; padding: 0.75rem; border-radius: 8px;">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 2rem;">
+                <label for="reg-password" style="display: block; margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">Create Security Password</label>
+                <input type="password" id="reg-password" class="form-control" placeholder="••••••••" required style="background: var(--bg-obsidian); border: 1px solid var(--border-color); color: white; width: 100%; padding: 0.75rem; border-radius: 8px;">
+            </div>
+
+            <button type="submit" id="btn-register" class="btn-primary" style="width: 100%; justify-content: center; padding: 1rem;">
+                <i class="fa-solid fa-user-plus"></i> Initialize Account
+            </button>
+        </form>
+
+        <div class="auth-footer" style="margin-top: 2rem; text-align: center; font-size: 0.9rem; color: var(--text-secondary);">
+            Authorized already? <a href="login.html" style="color: var(--accent-cyan); text-decoration: none; font-weight: 700;">Secure Login</a>
+        </div>
+    </div>
+
+    <script src="register.js"></script>
+</body>
+</html>

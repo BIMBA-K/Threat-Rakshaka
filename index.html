@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Command Center | Cyber Fraud Intelligence</title>
+    <!-- Professional Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- vis.js for Network Graph -->
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <!-- Chart.js for Timeline -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <!-- Leaflet.js for IP Geolocation Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script>
+        // Dashboard Access Control
+        if (!localStorage.getItem('policeUser')) {
+            window.location.href = 'login.html';
+        }
+        function logout() {
+            localStorage.removeItem('policeUser');
+            window.location.href = 'login.html';
+        }
+    </script>
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <i class="fa-solid fa-building-shield"></i>
+                <span>Cyber Intel Command</span>
+            </div>
+            
+            <nav class="nav-menu" style="margin-top: 2rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                <a href="index.html" class="nav-link active">
+                    <i class="fa-solid fa-gauge-high"></i>
+                    <span>Intelligence Overview</span>
+                </a>
+                <a href="#network-graph" class="nav-link">
+                    <i class="fa-solid fa-network-wired"></i>
+                    <span>Forensic Topology</span>
+                </a>
+                <a href="#threats-table" class="nav-link">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span>Active Threat Logs</span>
+                </a>
+                <a href="#awareness-generator" class="nav-link">
+                    <i class="fa-solid fa-bullhorn"></i>
+                    <span>Awareness Portal</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer" style="margin-top: auto; padding: 1rem 0;">
+                <button class="btn-logout" onclick="logout()" style="width: 100%; justify-content: center; border-radius: 8px;">
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content" style="flex: 1; height: 100vh; overflow-y: auto;">
+            <header class="dashboard-header">
+                <div class="header-content">
+                    <div class="header-title-area">
+                        <h1>Operations Center Dashboard</h1>
+                        <p>Tracing Fraudulent APK Sources & Cyber Threat Infrastructure</p>
+                    </div>
+                    <div class="header-actions">
+                        <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Theme">
+                            <i class="fa-solid fa-moon"></i>
+                            <i class="fa-solid fa-sun"></i>
+                        </button>
+                        <div class="status-indicator">
+                            <span class="pulse"></span>
+                            <span id="last-updated">Live Monitoring Active</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="dashboard-container">
+                <!-- Rapid Spread Alert Banner -->
+                <div id="rapid-spread-alert" class="alert-banner" style="display: none;">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span><strong>⚠ Rapid Malware Spread Detected:</strong> High frequency of identical threats detected within a short time window.</span>
+                </div>
+
+                <!-- Statistics Section -->
+                <section id="stats-section" class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="color: var(--accent-cyan);">
+                            <i class="fa-solid fa-file-shield"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h3>Total Threat Reports</h3>
+                            <p class="stat-value" id="stat-total">--</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="color: var(--color-danger);">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h3>Dangerous APKs</h3>
+                            <p class="stat-value danger-text" id="stat-dangerous">--</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="color: var(--color-warning);">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h3>Suspicious APKs</h3>
+                            <p class="stat-value warning-text" id="stat-suspicious">--</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="color: var(--accent-indigo);">
+                            <i class="fa-solid fa-copy"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h3>Repeat APK Hashes</h3>
+                            <p class="stat-value" id="stat-repeat">--</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="color: #ef4444;">
+                            <i class="fa-solid fa-spider"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h3>Root Sources</h3>
+                            <p class="stat-value danger-text" id="stat-roots">--</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="color: #f97316;">
+                            <i class="fa-solid fa-cubes-stacked"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h3>Total Clusters</h3>
+                            <p class="stat-value warning-text" id="stat-clusters">--</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="color: #f87171;">
+                            <i class="fa-solid fa-ban"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h3>Blacklisted APKs</h3>
+                            <p class="stat-value danger-text" id="stat-blacklist-count">0</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="color: var(--accent-blue);">
+                            <i class="fa-solid fa-bolt"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h3>Most Active Hash</h3>
+                            <p class="stat-value" id="stat-active-hash" style="font-size: 1rem; word-break: break-all;">--</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="color: var(--color-danger);">
+                            <i class="fa-solid fa-skull"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h3>Dangerous Cluster</h3>
+                            <p class="stat-value danger-text" id="stat-danger-cluster">--</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Intelligence Summary Panel -->
+                <section class="intel-stats-section">
+                    <div class="section-header">
+                        <h2><i class="fa-solid fa-microchip"></i> Infrastructure Intelligence</h2>
+                        <p class="subtitle">Deep analysis of threat-related digital assets</p>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card" style="border-left: 4px solid #10b981;">
+                            <div class="stat-details">
+                                <h3>Unique Domains</h3>
+                                <p class="stat-value" id="stat-domains">--</p>
+                            </div>
+                        </div>
+                        <div class="stat-card" style="border-left: 4px solid #eab308;">
+                            <div class="stat-details">
+                                <h3>Unique IPs</h3>
+                                <p class="stat-value" id="stat-ips">--</p>
+                            </div>
+                        </div>
+                        <div class="stat-card" style="border-left: 4px solid #ec4899;">
+                            <div class="stat-details">
+                                <h3>Certificates</h3>
+                                <p class="stat-value" id="stat-certs">--</p>
+                            </div>
+                        </div>
+                        <div class="stat-card" style="border-left: 4px solid #ef4444;">
+                            <div class="stat-details">
+                                <h3>Top Domain</h3>
+                                <p class="stat-value danger-text" id="stat-top-domain" style="font-size: 0.9rem; word-break: break-all;">--</p>
+                            </div>
+                        </div>
+                        <div class="stat-card" style="border-left: 4px solid #f59e0b;">
+                            <div class="stat-details">
+                                <h3>Top IP</h3>
+                                <p class="stat-value warning-text" id="stat-top-ip" style="font-size: 1rem;">--</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Controls Section -->
+                <section class="controls-section">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="search-input" placeholder="Search by App Name, Hash, Domain, IP, Cert...">
+                    </div>
+                    <div class="control-actions" style="display: flex; gap: 1.5rem; align-items: center;">
+                        <div class="sort-controls">
+                            <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Sort By</label>
+                            <select id="sort-select">
+                                <option value="time-desc">Detection Time (Newest)</option>
+                                <option value="time-asc">Detection Time (Oldest)</option>
+                                <option value="score-desc">Risk Score (High to Low)</option>
+                                <option value="score-asc">Risk Score (Low to High)</option>
+                            </select>
+                        </div>
+                        <button id="btn-export" class="btn-primary">
+                            <i class="fa-solid fa-file-export"></i> Export Intelligence
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Timeline Analysis Section -->
+                <section id="timeline-section" class="timeline-section">
+                    <div class="section-header">
+                        <h2><i class="fa-solid fa-chart-line"></i> Threat Propagation Timeline</h2>
+                        <p class="subtitle">7-day malware activity trajectory analysis</p>
+                    </div>
+                    <div style="position: relative; height: 350px; width: 100%;">
+                        <canvas id="timeline-chart"></canvas>
+                    </div>
+                    <div class="timeline-explanation">
+                        <h3><i class="fa-solid fa-shield-halved"></i> Strategic Insights</h3>
+                        <p>This timeline identifies surges in fraudulent activity. Spikes typically correlate with the launch of new phishing campaigns or the activation of mobile botnets.</p>
+                    </div>
+                </section>
+
+                <!-- Root Malware Sources Section -->
+                <section class="table-section root-sources-section">
+                    <div class="section-header" style="padding: 1.5rem; border-bottom: 1px solid var(--border-color);">
+                        <h2><i class="fa-solid fa-spider"></i> High-Impact Malware Roots</h2>
+                        <p class="subtitle">Hashes identified with widespread distribution (>5 unique instances)</p>
+                    </div>
+                    <div class="table-container">
+                        <table id="root-table">
+                            <thead>
+                                <tr>
+                                    <th>APK Fingerprint (Hash)</th>
+                                    <th>Instances</th>
+                                    <th>Risk Index</th>
+                                    <th>First Sighting</th>
+                                    <th>Last Activity</th>
+                                </tr>
+                            </thead>
+                            <tbody id="root-table-body">
+                                <tr class="loading-row">
+                                    <td colspan="5" class="text-center" style="padding: 3rem; color: var(--text-secondary);">
+                                        <i class="fa-solid fa-spinner fa-spin"></i> Analyzing root sources...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Threat Clusters Section -->
+                <section class="clusters-section">
+                    <div class="section-header">
+                        <h2><i class="fa-solid fa-cubes-stacked"></i> Behavioral Threat Clusters</h2>
+                        <p class="subtitle">Automated grouping based on shared infrastructure and permission heuristics</p>
+                    </div>
+                    <div class="cluster-grid" id="cluster-container">
+                        <div class="empty-state text-center" style="width: 100%; padding: 4rem; grid-column: 1/-1;">
+                            <i class="fa-solid fa-microscope fa-3x" style="margin-bottom: 1rem; opacity: 0.1;"></i>
+                            <p>Correlating behavioral signals...</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Threat Reports Table Section -->
+                <section class="table-section">
+                    <div class="section-header" style="padding: 1.5rem; border-bottom: 1px solid var(--border-color);">
+                        <h2><i class="fa-solid fa-list-check"></i> Master Threat Registry</h2>
+                    </div>
+                    <div class="table-container">
+                        <table id="threats-table">
+                            <thead>
+                                <tr>
+                                    <th>Application</th>
+                                    <th>Risk Score</th>
+                                    <th>Severity</th>
+                                    <th>APK Hash</th>
+                                    <th>Permissions</th>
+                                    <th>Timestamp</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-body">
+                                <tr class="loading-row">
+                                    <td colspan="6" class="text-center" style="padding: 3rem; color: var(--text-secondary);">
+                                        <i class="fa-solid fa-dna fa-spin"></i> Extracting threat metadata...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+
+                <!-- Forensic Network Projection Section -->
+                <section id="network-graph" class="graph-section">
+                    <div class="section-header" style="padding: 1.5rem; border-bottom: 1px solid var(--border-color);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <div>
+                                <h2><i class="fa-solid fa-network-wired"></i> Forensic Network Projection</h2>
+                                <p class="subtitle">Multi-dimensional mapping of malware distribution infrastructure</p>
+                            </div>
+                            <div class="graph-controls">
+                                <label style="font-size: 0.7rem; color: var(--text-muted); font-weight: 800; text-transform: uppercase; display: block; margin-bottom: 0.5rem;">Projection Focus</label>
+                                <select id="graph-focus-select" class="form-control" style="min-width: 280px; background: var(--bg-obsidian);">
+                                    <option value="all">Global Intelligence Overview</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="graph-layout">
+                        <div class="graph-main" style="position: relative;">
+                            <div class="graph-legend" style="position: absolute; top: 1rem; left: 1rem; z-index: 10; background: rgba(2, 6, 23, 0.8); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); flex-direction: column; gap: 0.5rem;">
+                                <div class="legend-item"><span class="legend-color" style="background: #ef4444;"></span> APK (Box)</div>
+                                <div class="legend-item"><span class="legend-color" style="background: #f97316;"></span> Domain (Ellipse)</div>
+                                <div class="legend-item"><span class="legend-color" style="background: #eab308;"></span> IP (Dot)</div>
+                                <div class="legend-item"><span class="legend-color" style="background: #a855f7;"></span> Cert (Diamond)</div>
+                            </div>
+                            <div id="network-graph-container" class="network-container" style="height: 100%; min-height: 500px;"></div>
+                        </div>
+                        
+                        <div class="graph-sidebar">
+                            <div id="node-details" class="details-panel">
+                                <h3><i class="fa-solid fa-microscope"></i> Intelligence Inspector</h3>
+                                <div id="panel-content" class="panel-content">
+                                    <p class="empty-state">Select a node in the topology map to view granular forensic details.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+
+                <!-- Public Awareness & Advisory Generator Section -->
+                <section id="awareness-generator" class="awareness-generator-section">
+                    <div class="section-header">
+                        <h2><i class="fa-solid fa-bullhorn"></i> Strategic Advisory Portal</h2>
+                        <p class="subtitle">Broadcast high-fidelity cyber threat warnings to the public</p>
+                    </div>
+
+                    <div class="awareness-grid">
+                        <div class="awareness-form-panel">
+                            <div class="form-group">
+                                <label>Target Threat Vector</label>
+                                <select id="apk-alert-select" class="form-control">
+                                    <option value="">-- Select Active Threat --</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Advisory Content Dispatch</label>
+                                <textarea id="advisory-editor" class="form-control" rows="8" placeholder="Draft professional public safety message..."></textarea>
+                                <div class="editor-footer">
+                                    <span id="char-counter">0/280 characters</span>
+                                    <span id="draft-status" style="margin-left: auto; color: var(--accent-cyan);"></span>
+                                </div>
+                            </div>
+
+                            <div class="action-buttons" style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                                <button id="btn-generate-template" class="btn-secondary">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i> Intelligence Template
+                                </button>
+                                <button id="btn-publish-advisory" class="btn-primary" style="background: var(--color-danger);">
+                                    <i class="fa-solid fa-paper-plane"></i> Publish Alert
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="awareness-preview-panel" style="background: var(--bg-slate); border: 1px solid var(--border-color); padding: 2rem;">
+                            <h3 style="margin-bottom: 1.5rem; font-size: 0.9rem; text-transform: uppercase; color: var(--text-muted);"><i class="fa-solid fa-eye"></i> Forensic Transmission Preview</h3>
+                            
+                            <div class="preview-content">
+                                <div class="social-card" style="background: white; color: #1a1a1a; border-radius: 16px; padding: 1.5rem; box-shadow: var(--shadow-lg);">
+                                    <div class="social-header" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                                        <div class="profile-circle" style="width: 48px; height: 48px; background: #e5e7eb; border-radius: 50%;"></div>
+                                        <div class="profile-info">
+                                            <span class="profile-name" style="font-weight: 800; display: block;">Cyber Intelligence Unit</span>
+                                            <span class="profile-handle" style="color: #6b7280; font-size: 0.85rem;">@Police_CyberIntel</span>
+                                        </div>
+                                    </div>
+                                    <div class="instagram-image-placeholder" style="margin-bottom: 1rem;">
+                                        <canvas id="poster-canvas" width="600" height="600" style="width: 100%; height: auto; border-radius: 12px; border: 1px solid #e5e7eb;"></canvas>
+                                    </div>
+                                    <div id="unified-post-body" class="social-body" style="font-size: 0.95rem; line-height: 1.5; white-space: pre-wrap; color: #1f2937;">Awaiting Intelligence...</div>
+                                </div>
+                            </div>
+
+                            <div class="share-actions" style="display: flex; gap: 0.75rem; margin-top: 2rem;">
+                                <button class="btn-secondary" onclick="shareToPlatform('twitter')" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-size: 0.85rem; padding: 0.6rem;">
+                                    <i class="fa-brands fa-x-twitter"></i> Twitter
+                                </button>
+                                <button class="btn-secondary" onclick="shareToPlatform('instagram')" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-size: 0.85rem; padding: 0.6rem;">
+                                    <i class="fa-brands fa-instagram"></i> Instagram
+                                </button>
+                                <button class="btn-secondary" onclick="shareToPlatform('facebook')" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-size: 0.85rem; padding: 0.6rem;">
+                                    <i class="fa-brands fa-facebook-f"></i> Facebook
+                                </button>
+                            </div>
+
+                            <div class="preview-actions">
+                                <button id="btn-copy-post" class="btn-action btn-copy">
+                                    <i class="fa-solid fa-copy"></i> Copy Intelligence
+                                </button>
+                                <button id="btn-download-poster" class="btn-action btn-export">
+                                    <i class="fa-solid fa-file-export"></i> Export Forensic Visual
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="awareness-history" style="margin-top: 3rem; border-top: 1px solid var(--border-color); padding-top: 2rem;">
+                        <h3 style="margin-bottom: 1.5rem; font-size: 1rem;"><i class="fa-solid fa-history"></i> Advisory Transmission Logs</h3>
+                        <div id="awareness-history-list" class="history-grid">
+                            <p class="empty-state">No transmissions logged in this operational session.</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Leaflet.js and Map Component -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="mapComponent.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
